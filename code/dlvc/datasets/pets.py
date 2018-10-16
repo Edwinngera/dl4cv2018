@@ -1,5 +1,7 @@
-
 from ..dataset import Sample, Subset, ClassificationDataset
+
+import os
+
 
 class PetsDataset(ClassificationDataset):
     '''
@@ -24,8 +26,9 @@ class PetsDataset(ClassificationDataset):
         # TODO implement
         # See the CIFAR-10 website on how to load the data files
 
-        pass
-
+        if not os.path.exists(fdir):
+            raise ValueError(f'"{fdir}" does not exist')
+        
     def __len__(self) -> int:
         '''
         Returns the number of samples in the dataset.
