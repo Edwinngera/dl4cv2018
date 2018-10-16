@@ -5,7 +5,7 @@
 
 2. Download the CIFAR-10 python version of the dataset from https://www.cs.toronto.edu/%7Ekriz/cifar.html to `./data/`
 
-3. Extract the dataset in `.data` - This should create a `./datad/cifar-10-batches-py/` folder containing the `data_batch*` files
+3. Extract the dataset in `./data` - This should create a `./data/cifar-10-batches-py/` folder containing the `data_batch*` files
 
 
 ## Running
