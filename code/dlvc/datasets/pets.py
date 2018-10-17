@@ -65,8 +65,7 @@ class PetsDataset(ClassificationDataset):
 
         filenames = subset_mapping[subset]
 
-        self.labels = []
-        self.images = []
+        self.samples = []
 
         for filename in filenames:
             path = os.path.join(fdir, filename)
@@ -80,10 +79,12 @@ class PetsDataset(ClassificationDataset):
             data = batch[b'data']
 
             for i, label in enumerate(labels):
+                sample_label = None
+
                 if label == cat_index:
-                    self.labels.append(LABEL_CAT)
+                    sample_label = LABEL_CAT
                 elif label == dog_index:
-                    self.labels.append(LABEL_DOG)
+                    sample_label = LABEL_DOG
                 else:
                     continue
 
@@ -91,24 +92,26 @@ class PetsDataset(ClassificationDataset):
                 rgb = np.reshape(data[i], (3, 32, 32))
 
                 # Ordering should be BGR
-                img[:, :, 2] = rgb[0]
-                img[:, :, 1] = rgb[1]
-                img[:, :, 0] = rgb[2]
+                img[:, :, 0] = rgb[2] # blue channel
+                img[:, :, 1] = rgb[1] # green channel
+                img[:, :, 2] = rgb[0] # red channel
 
-                self.images.append(img)
+                self.samples.append(Sample(idx=len(self.samples),
+                                           data=img,
+                                           label=sample_label))
 
     def __len__(self) -> int:
         '''
         Returns the number of samples in the dataset.
         '''
-        return len(self.images)
+        return len(self.samples)
 
     def __getitem__(self, idx: int) -> Sample:
         '''
         Returns the idx-th sample in the dataset.
         Raises IndexError if the index is out of bounds.
         '''
-        return self.images[idx]
+        return self.samples[idx]
 
     def num_classes(self) -> int:
         '''
