@@ -3,7 +3,7 @@ from dlvc.datasets.pets import PetsDataset
 
 import cv2
 
-from dlvc import ops,batches
+from dlvc import ops, batches
 import numpy as np
 from dlvc.models import knn
 
@@ -26,7 +26,6 @@ if __name__ == "__main__":
         ops.vectorize(),
         ops.type_cast(np.float32)
     ])
-
 
     #The number of training batches is 1 if the batch size is set to the number of samples in the dataset
     generator = batches.BatchGenerator(dataset, len(dataset), True, op)

@@ -1,0 +1,31 @@
+Starting grid search with k=[1, 5, 20, 50, 100]
+
+Train classifier with k=1
+	Run training... done
+	Run validation... done (took 150.9827630519867)
+	Accuracy: 0.5972562469377756
+
+Train classifier with k=5
+	Run training... done
+	Run validation... done (took 153.74546098709106)
+	Accuracy: 0.602155805977462
+
+Train classifier with k=20
+	Run training... done
+	Run validation... done (took 153.45767498016357)
+	Accuracy: 0.6134247917687408
+
+Train classifier with k=50
+	Run training... done
+	Run validation... done (took 150.02651810646057)
+	Accuracy: 0.6129348358647722
+
+Train classifier with k=100
+	Run training... done
+	Run validation... done (took 150.6515190601349)
+	Accuracy: 0.6300832925036747
+
+Best accuracy '0.6300832925036747' with k='100'
+
+Evaluating on test set with k=100... done (took 146.59610605239868)
+	Accuracy: 0.62

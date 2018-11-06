@@ -72,8 +72,7 @@ class KnnClassifier(Model):
         self.traindata = data
         self.labels = labels
 
-        ###return 0 ?????
-
+        return 0
 
     def predict(self, data: np.ndarray) -> np.ndarray:
         '''
@@ -89,13 +88,13 @@ class KnnClassifier(Model):
         elif not (len(data.shape) == 1 and data.shape[0] == self.traindata.shape[1]):
             pass
         else:
-            raise ValueError ("data: shape %s must compatible with input_shape() %s" % ( data.shape, self.input_shape()))
+            raise ValueError("data: shape %s must compatible with input_shape() %s" % (data.shape, self.input_shape()))
 
         if len(data.shape) == 2:
-            label_scores = np.zeros((data.shape[0],self.num_classes)) #nr of samples, nr of classes
+            label_scores = np.zeros((data.shape[0], self.num_classes)) #nr of samples, nr of classes
         elif len(data.shape) == 1:
-            label_scores = np.zeros((1,self.num_classes))
-            data = np.array(data).reshape(1,-1)
+            label_scores = np.zeros((1, self.num_classes))
+            data = np.array(data).reshape(1, -1)
 
         distances = []
 
@@ -113,12 +112,12 @@ class KnnClassifier(Model):
             neighbor_labels = self.labels[neighbor_indices].tolist()
 
             #count the appearance of the class labels
-            label_count=[]
-            for label_nr  in range(0,self.num_classes):
+            label_count = []
+            for label_nr in range(0, self.num_classes):
                 label_count.append(neighbor_labels.count(label_nr))
 
             #calculate soft max
             e_x = np.exp(label_count - np.max(label_count))
-            label_scores[idx_sample,:] = e_x / e_x.sum(axis=0)
+            label_scores[idx_sample, :] = e_x / e_x.sum(axis=0)
 
         return label_scores

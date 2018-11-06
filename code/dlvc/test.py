@@ -71,10 +71,9 @@ class Accuracy(PerformanceMeasure):
         '''
         Resets the internal state.
         '''
-
-        # TODO implement
-
-        pass
+        self.n_correct = 0
+        self.n_samples = 0
+        self.accuracy_score = 0
 
     def update(self, prediction: np.ndarray, target: np.ndarray):
         '''
@@ -86,7 +85,19 @@ class Accuracy(PerformanceMeasure):
 
         # TODO implement
 
-        pass
+        if prediction.shape[0] != target.shape[0]:
+            print(prediction.shape[0], target.shape[0])
+            raise ValueError(f'number of prediction and target rows differs: {prediction.shape[0]} vs {target.shape[0]}')
+
+        if len(prediction.shape) != 2 or prediction.shape[1] < 2:
+            raise ValueError(f'wrong dimension for prediction columns. should be number of classes')
+
+        top_predictions = np.argmax(prediction, axis=1)
+
+        self.n_correct += (top_predictions == target).sum()
+        self.n_samples += len(prediction)
+
+        self.accuracy_score = self.n_correct / self.n_samples
 
     def __str__(self):
         '''
@@ -95,8 +106,7 @@ class Accuracy(PerformanceMeasure):
 
         # TODO implement
         # return something like "accuracy: 0.395"
-
-        pass
+        return f'accuracy: {self.accuracy()}'
 
     def __lt__(self, other) -> bool:
         '''
@@ -105,8 +115,10 @@ class Accuracy(PerformanceMeasure):
         '''
 
         # TODO implement
+        if type(self.accuracy) is not type(other):
+            raise ValueError('types differ')
 
-        pass
+        return self.accuracy() < other
 
     def __gt__(self, other) -> bool:
         '''
@@ -115,8 +127,10 @@ class Accuracy(PerformanceMeasure):
         '''
 
         # TODO implement
+        if type(self.accuracy) is not type(other):
+            raise ValueError('types differ')
 
-        pass
+        return self.accuracy() > other
 
     def accuracy(self) -> float:
         '''
@@ -126,5 +140,4 @@ class Accuracy(PerformanceMeasure):
 
         # TODO implement
         # on this basis implementing the other methods is easy (one line)
-
-        pass
+        return self.accuracy_score
