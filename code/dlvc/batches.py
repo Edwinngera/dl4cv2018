@@ -1,11 +1,11 @@
 
 from .dataset import Dataset
 from .ops import Op
-import torch
 import numpy as np
 import math
 
 import typing
+
 
 class Batch:
     '''
@@ -20,6 +20,7 @@ class Batch:
         self.data = None
         self.label = None
         self.idx = None
+
 
 class BatchGenerator:
     '''
@@ -54,28 +55,24 @@ class BatchGenerator:
         #check Dataset
         if not isinstance(dataset, Dataset):
             raise TypeError("dataset should be a Dataset type")
-        if len(dataset)==0:
+        if len(dataset) == 0:
             raise ValueError("length of dataset is zero")
 
-        self.dataset= dataset
+        self.dataset = dataset
         self.num = num
         self.shuffle = shuffle
         self.op = op
 
-
         if shuffle:
-            self.iter = iter(torch.randperm (len (self.dataset)).tolist())
+            self.iter = iter(np.random.permutation(len(self.dataset)).tolist())
         else:
             self.iter = iter(range(len(self.dataset)))
-
 
     def __len__(self) -> int:
         '''
         Returns the number of batches generated per iteration.
         '''
-        return math.ceil(len(self.dataset)/ self.num)
-
-
+        return math.ceil(len(self.dataset) / self.num)
 
     def __iter__(self) -> typing.Iterable[Batch]:
         '''
@@ -107,4 +104,3 @@ class BatchGenerator:
             batch.label = np.asarray(labels)
             batch.idx = np.asarray(idx)
             yield batch
-

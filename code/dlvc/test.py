@@ -87,10 +87,10 @@ class Accuracy(PerformanceMeasure):
 
         if prediction.shape[0] != target.shape[0]:
             print(prediction.shape[0], target.shape[0])
-            raise ValueError(f'number of prediction and target rows differs: {prediction.shape[0]} vs {target.shape[0]}')
+            raise ValueError('number of prediction and target rows differs: {} vs {}'.format(prediction.shape[0], target.shape[0]))
 
         if len(prediction.shape) != 2 or prediction.shape[1] < 2:
-            raise ValueError(f'wrong dimension for prediction columns. should be number of classes')
+            raise ValueError('wrong dimension for prediction columns. should be number of classes')
 
         top_predictions = np.argmax(prediction, axis=1)
 
@@ -106,7 +106,7 @@ class Accuracy(PerformanceMeasure):
 
         # TODO implement
         # return something like "accuracy: 0.395"
-        return f'accuracy: {self.accuracy()}'
+        return 'accuracy: {}'.format(self.accuracy())
 
     def __lt__(self, other) -> bool:
         '''

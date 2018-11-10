@@ -35,10 +35,10 @@ if __name__ == "__main__":
 
     ks = [1, 5, 20, 50, 100]
 
-    print(f'Starting grid search with k={ks}')
+    print('Starting grid search with k={}'.format(ks))
     print()
     for k in ks:
-        print(f'Train classifier with k={k}')
+        print('Train classifier with k={}'.format(k))
         knn_cl = knn.KnnClassifier(k=k, input_dim=INPUT_DIM,
                                    num_classes=NUM_CLASSES)
 
@@ -51,11 +51,11 @@ if __name__ == "__main__":
         print('\tRun validation... ', end='', flush=True)
         t0 = time.time()
         predictions = knn_cl.predict(validation_data.data)
-        print(f'done (took {time.time() - t0})')
+        print('done (took {}s)'.format(time.time() - t0))
 
         measure.reset()
         measure.update(predictions, validation_data.label)
-        print(f'\tAccuracy: {measure.accuracy()}')
+        print('\tAccuracy: {}'.format(measure.accuracy()))
         print()
 
         accuracies.append(measure.accuracy())
@@ -64,14 +64,14 @@ if __name__ == "__main__":
     best_accuracy = accuracies[best_accuracy_index]
     best_k = ks[best_accuracy_index]
 
-    print(f"Best accuracy '{best_accuracy}' with k='{best_k}'")
+    print("Best accuracy '{}' with k='{}'".format(best_accuracy, best_k))
     print()
-    print(f'Evaluating on test set with k={best_k}... ', end='', flush=True)
+    print('Evaluating on test set with k={}... '.format(best_k), end='', flush=True)
     t0 = time.time()
     predictions = knn_cl.predict(test_data.data)
-    print(f'done (took {time.time() - t0})')
+    print('done (took {}s)'.format(time.time() - t0))
 
     measure.reset()
     measure.update(predictions, test_data.label)
-    print(f'\tAccuracy: {measure.accuracy()}')
+    print('\tAccuracy: {}'.format(measure.accuracy()))
     print()

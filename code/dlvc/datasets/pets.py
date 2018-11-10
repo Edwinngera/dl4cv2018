@@ -38,12 +38,12 @@ class PetsDataset(ClassificationDataset):
         # TODO implement
         # See the CIFAR-10 website on how to load the data files
         if not os.path.exists(fdir):
-            raise ValueError(f'"{fdir}" does not exist')
+            raise ValueError('"{}" does not exist'.format(fdir))
 
         # Load labels
         path = os.path.join(fdir, 'batches.meta')
         if not os.path.exists(path):
-            raise ValueError(f'"{path}" does not exist')
+            raise ValueError('"{}" does not exist'.format(path))
 
         meta = unpickle(path)
         assert meta is not None
@@ -71,7 +71,7 @@ class PetsDataset(ClassificationDataset):
             path = os.path.join(fdir, filename)
 
             if not os.path.exists(path):
-                raise ValueError(f'"{path}" does not exist')
+                raise ValueError('"{}" does not exist'.format(path))
 
             batch = unpickle(path)
 
