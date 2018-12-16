@@ -54,7 +54,7 @@ class Fn:
             raise ValueError('x1 is out of range')
 
         if loc.x2 <0 and loc.x2 >= self.height:
-            raise ValueError('x1 is out of range')
+            raise ValueError('x2 is out of range')
         
         x1_low = int(math.floor(loc.x1))
         x1_high = int(math.ceil(loc.x1))
@@ -79,7 +79,7 @@ def grad(fn: Fn, loc: Vec2, eps: float) -> Vec2:
         raise ValueError('x1 is out of range')
 
     if loc.x2 <0 and loc.x2 >= fn.height:
-        raise ValueError('x1 is out of range')
+        raise ValueError('x2 is out of range')
 
     dx1 = ( fn(Vec2(loc.x1 + eps, loc.x2)) - fn(Vec2(loc.x1 - eps, loc.x2)) ) / (2 * eps)
     dx2 = ( fn(Vec2(loc.x1, loc.x2 + eps)) - fn(Vec2(loc.x1, loc.x2 - eps)) ) / (2 * eps)
