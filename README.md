@@ -12,3 +12,6 @@
 
 1. `cd code`
 2. `python main.py`
+
+## Running Assignment 2 - Part 1
+For example `python gradient_descent_2d.py fn/beale.png 4 8 --beta 0.9 --nesterov --step_size 100`
