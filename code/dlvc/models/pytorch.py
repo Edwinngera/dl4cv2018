@@ -130,4 +130,7 @@ class CnnClassifier(Model):
         softmax = nn.functional.softmax(outputs,
                                         dim=1)  # nn.Softmax gives a RuntimeWarning, using functional.softmax instead
 
-        return softmax.detach().numpy()
+        if self.device == "cuda":
+            return softmax.detach().cpu().numpy()
+        else:
+            return softmax.detach().numpy()

@@ -5,6 +5,7 @@ from dlvc.models import knn, pytorch as cnn
 from dlvc import ops, batches
 
 import numpy as np
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
@@ -29,17 +30,19 @@ def load_dataset(subset: Subset) -> batches.BatchGenerator:
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(3, 6, 5)
+        # Deep conv filters produce better results
+        # Adding more conv layers does not seem to help
+        self.conv1 = nn.Conv2d(3, 64, 5)
         self.pool = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(6, 16, 5)
-        self.fc1 = nn.Linear(16 * 5 * 5, 120)
-        self.fc2 = nn.Linear(120, 72)
-        self.fc3 = nn.Linear(72, 2)
+        self.conv2 = nn.Conv2d(64, 128, 5)
+        self.fc1 = nn.Linear(128 * 5 * 5, 128)
+        self.fc2 = nn.Linear(128, 64)
+        self.fc3 = nn.Linear(64, 2)
 
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
         x = self.pool(F.relu(self.conv2(x)))
-        x = x.view(-1, 16 * 5 * 5)
+        x = x.view(-1, 128 * 5 * 5)
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
@@ -51,7 +54,10 @@ if __name__ == "__main__":
     validation_batch = load_dataset(Subset.VALIDATION)
 
     net = Net()
-    # net.cuda() #uncomment for GPU
+    
+    if torch.cuda.is_available():
+        net = net.cuda()
+
     learning_rate = 0.01
     weight_decay = 0.001
 
