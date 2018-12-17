@@ -35,3 +35,45 @@ def vectorize() -> Op:
     '''
 
     return np.ravel
+
+
+def hwc2chw() -> Op:
+    '''
+    Flip a 3D array with shape HWC to shape CHW.
+    '''
+
+    def op(sample: np.ndarray) -> np.ndarray:
+        return sample.transpose(2, 0, 1)
+
+    return op
+    # return np.transpose(2,0,1)
+
+
+def chw2hwc() -> Op:
+    '''
+    Flip a 3D array with shape CHW to HWC.
+    '''
+
+    return np.transpose(1, 2, 0)
+
+
+def add(val: float) -> Op:
+    '''
+    Add a scalar value to all array elements.
+    '''
+
+    def op(sample: np.ndarray) -> np.ndarray:
+        return sample + val
+
+    return op
+
+
+def mul(val: float) -> Op:
+    '''
+    Multiply all array elements by the given scalar.
+    '''
+
+    def op(sample: np.ndarray) -> np.ndarray:
+        return sample * val
+
+    return op

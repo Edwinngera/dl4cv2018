@@ -42,8 +42,6 @@ class BatchGenerator:
         Raises ValueError on invalid argument values, such as if num is > len(dataset).
         '''
 
-        # TODO implement
-
         #check Number of Samples per Batch
         if not isinstance(num, int) or num <= 0:
             raise ValueError("num should be a positive integeral value, "
@@ -63,10 +61,11 @@ class BatchGenerator:
         self.shuffle = shuffle
         self.op = op
 
+
         if shuffle:
-            self.iter = iter(np.random.permutation(len(self.dataset)).tolist())
+            self.iteration_sequence = np.random.permutation(len(self.dataset)).tolist()
         else:
-            self.iter = iter(range(len(self.dataset)))
+            self.iteration_sequence = range(len(self.dataset))
 
     def __len__(self) -> int:
         '''
@@ -82,7 +81,7 @@ class BatchGenerator:
         data = []
         idx = []
         labels = []
-        for sample_idx in self.iter:
+        for sample_idx in self.iteration_sequence:
             sample = self.dataset[sample_idx]
             if self.op:
                 data.append(self.op(sample.data))
