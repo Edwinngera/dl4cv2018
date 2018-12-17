@@ -1,6 +1,8 @@
 from dlvc.dataset import Subset
 from dlvc.datasets.pets import PetsDataset
 
+import cv2
+
 from dlvc import ops, batches
 import numpy as np
 from dlvc.models import knn
@@ -10,12 +12,12 @@ if __name__ == "__main__":
                           Subset.TEST)
 
     print('Found dataset directory')
-    print('{} samples'.format(len(dataset)))
+    print(f'{len(dataset)} samples')
 
     test_sample = dataset[1]
 
-    print('Index of test sample: {.idx}'.format(test_sample))
-    print('Label of test sample: {}'.format(test_sample.label))
+    print(f'Index of test sample: {test_sample.idx}')
+    print(f'Label of test sample: {test_sample.label}')
     #cv2.imshow('Sample Image', test_sample.data)
     #cv2.waitKey(0)
     #cv2.destroyAllWindows()
