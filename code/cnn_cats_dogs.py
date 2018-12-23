@@ -14,15 +14,25 @@ INPUT_DIM = 3072
 NUM_CLASSES = 2
 
 
-def load_dataset(subset: Subset) -> batches.BatchGenerator:
+def load_dataset(subset: Subset, augment=False) -> batches.BatchGenerator:
     dataset = PetsDataset('../data/cifar-10-batches-py', subset)
 
-    op = ops.chain([
+    ops_list = []
+
+    if augment:
+        ops_list += [
+            ops.hflip(),
+            ops.rcrop(32, 8, 'constant')
+        ]
+
+    ops_list += [
         ops.hwc2chw(),
         ops.add(-127.5),
         ops.mul(1 / 127.5),
         ops.type_cast(np.float32)
-    ])
+    ]
+
+    op = ops.chain(ops_list)
 
     return batches.BatchGenerator(dataset, 128, True, op)
 
@@ -50,7 +60,7 @@ class Net(nn.Module):
 
 
 if __name__ == "__main__":
-    training_batch = load_dataset(Subset.TRAINING)
+    training_batch = load_dataset(Subset.TRAINING, augment=True)
     validation_batch = load_dataset(Subset.VALIDATION)
 
     net = Net()
