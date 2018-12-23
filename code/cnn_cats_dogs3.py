@@ -50,23 +50,24 @@ class Net(nn.Module):
         self.pool = nn.MaxPool2d(2, 2)
         self.conv1 = nn.Conv2d(3, 64, 5)
         self.conv2 = nn.Conv2d(64, 128, 5)
-        self.conv3 = nn.Conv2d(128, 256, 5)
-        self.fc1 = nn.Linear(256 * 1 * 1, 128)
+        # self.conv3 = nn.Conv2d(128, 256, 5)
+        # self.fc1 = nn.Linear(256 * 1 * 1, 128)
+        self.fc1 = nn.Linear(128 * 5 * 5, 128)
         self.fc2 = nn.Linear(128, 64)
         self.fc3 = nn.Linear(64, 2)
 
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
-        if self.dropout:
-            x = self.dropout(x)
+        # if self.dropout:
+        #     x = self.dropout(x)
         x = self.pool(F.relu(self.conv2(x)))
-        if self.dropout:
-            x = self.dropout(x)
-        x = self.pool(F.relu(self.conv3(x)))
-        if self.dropout:
-            x = self.dropout(x)
-        
-        x = x.view(-1, 256 * 1 * 1)
+        # if self.dropout:
+        #     x = self.dropout(x)
+        # x = self.pool(F.relu(self.conv3(x)))
+        # if self.dropout:
+        #     x = self.dropout(x)
+        # x = x.view(-1, 256 * 1 * 1)
+        x = x.view(-1, 128 * 5 * 5)
         x = F.relu(self.fc1(x))
         if self.dropout:
             x = self.dropout(x)
@@ -106,7 +107,7 @@ if __name__ == "__main__":
     training_batch = load_dataset(Subset.TRAINING, augment=True)
     validation_batch = load_dataset(Subset.VALIDATION)
 
-    model = get_standard_model(dropout_probability=0.5) #
+    model = get_standard_model(dropout_probability=0.2) #
     # model = get_standard_model(dropout_probability=0.2) # BEST with augment
     # model = get_standard_model(dropout_probability=None)
 
@@ -126,7 +127,7 @@ if __name__ == "__main__":
     mean_loss_list = []
 
     best_accuracy = 0
-    for epoch in range(1, 201):
+    for epoch in range(1, 101):
         predictions = np.zeros((1, 2))
         loss_list = []
         labels = []
@@ -160,4 +161,6 @@ if __name__ == "__main__":
             print('\tNew best accuracy. Saved model to: "{}"'.format(best_model_path))
 
         accuracies.append(measure.accuracy())
+    
+    print('Best accuracy: {0:0.3f}'.format(best_accuracy))
     
