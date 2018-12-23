@@ -177,7 +177,7 @@ if __name__ == "__main__":
 
         if measure.accuracy() > best_accuracy:
             best_accuracy = measure.accuracy()
-            torch.save(net.state_dict(), best_model_path)
+            torch.save(model.state_dict(), best_model_path)
             print('\tNew best accuracy. Saved model to: "{}"'.format(best_model_path))
 
         accuracies.append(measure.accuracy())
