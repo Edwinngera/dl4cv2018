@@ -37,6 +37,34 @@ def load_dataset(subset: Subset, augment=False) -> batches.BatchGenerator:
     return batches.BatchGenerator(dataset, 128, True, op)
 
 
+class PretrainedNet(nn.Module):
+    def __init__(self):
+        super(PretrainedNet, self).__init__()
+        # Deep conv filters produce better results
+        # Adding more conv layers does not seem to help
+        
+        self.model = models.resnet18(pretrained=True)
+        for param in self.model.parameters():
+            param.requires_grad = False
+
+    def forward(self, x):
+        x = self.pool(F.relu(self.conv1(x)))
+        if self.dropout:
+            x = self.dropout(x)
+        x = self.pool(F.relu(self.conv2(x)))
+        if self.dropout:
+            x = self.dropout(x)
+        x = x.view(-1, 128 * 5 * 5)
+        x = F.relu(self.fc1(x))
+        if self.dropout:
+            x = self.dropout(x)
+        x = F.relu(self.fc2(x))
+        if self.dropout:
+            x = self.dropout(x)
+        x = self.fc3(x)
+        return x
+
+
 class Net(nn.Module):
     def __init__(self, dropout_probability=None):
         super(Net, self).__init__()
@@ -73,21 +101,45 @@ class Net(nn.Module):
         return x
 
 
+def get_standard_model(dropout_probability=None):
+    model = Net(dropout_probability)
+    return model
+
+def get_pretrained_model(dropout_probability=None):
+    import torchvision.models as models
+    model = models.resnet18(pretrained=True)
+
+    for param in model.parameters():
+        param.requires_grad = False
+
+    num_features = model.fc.in_features
+
+    final_layer = nn.Linear(num_features, 2)
+    
+    if dropout_probability:
+        final_layer = nn.Sequential(
+            nn.Dropout(dropout_probability),
+            final_layer)
+    
+    model.fc = final_layer
+    return model
+
 if __name__ == "__main__":
     best_model_path = 'best_model.pth'
 
     training_batch = load_dataset(Subset.TRAINING, augment=True)
     validation_batch = load_dataset(Subset.VALIDATION)
 
-    net = Net(dropout_probability=0.5)
-    
+    model = get_standard_model(dropout_probability=0.5)
+    # model = get_pretrained_model()
+
     if torch.cuda.is_available():
-        net = net.cuda()
+        model = model.cuda()
 
     learning_rate = 0.01
     weight_decay = 0.001
 
-    cnn_cl = cnn.CnnClassifier(net, (3, 32, 32), num_classes=2, lr=learning_rate, wd=weight_decay)
+    cnn_cl = cnn.CnnClassifier(model, (3, 32, 32), num_classes=2, lr=learning_rate, wd=weight_decay)
 
     loss_list = []
     measure = Accuracy()
