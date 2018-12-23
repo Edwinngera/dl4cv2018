@@ -1,5 +1,6 @@
 !data/.keep
 .vscode
+best_model.pth
 data/*
 *.zip
 .DS_Store
