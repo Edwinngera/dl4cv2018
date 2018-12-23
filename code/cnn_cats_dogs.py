@@ -38,10 +38,16 @@ def load_dataset(subset: Subset, augment=False) -> batches.BatchGenerator:
 
 
 class Net(nn.Module):
-    def __init__(self):
+    def __init__(self, dropout_probability=None):
         super(Net, self).__init__()
         # Deep conv filters produce better results
         # Adding more conv layers does not seem to help
+        
+        self.dropout = None
+
+        if dropout_probability:
+            self.dropout = nn.Dropout(dropout_probability)
+
         self.conv1 = nn.Conv2d(3, 64, 5)
         self.pool = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(64, 128, 5)
@@ -51,19 +57,29 @@ class Net(nn.Module):
 
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
+        if self.dropout:
+            x = self.dropout(x)
         x = self.pool(F.relu(self.conv2(x)))
+        if self.dropout:
+            x = self.dropout(x)
         x = x.view(-1, 128 * 5 * 5)
         x = F.relu(self.fc1(x))
+        if self.dropout:
+            x = self.dropout(x)
         x = F.relu(self.fc2(x))
+        if self.dropout:
+            x = self.dropout(x)
         x = self.fc3(x)
         return x
 
 
 if __name__ == "__main__":
+    best_model_path = 'best_model.pth'
+
     training_batch = load_dataset(Subset.TRAINING, augment=True)
     validation_batch = load_dataset(Subset.VALIDATION)
 
-    net = Net()
+    net = Net(dropout_probability=0.5)
     
     if torch.cuda.is_available():
         net = net.cuda()
@@ -78,6 +94,7 @@ if __name__ == "__main__":
     accuracies = []
     mean_loss_list = []
 
+    best_accuracy = 0
     for epoch in range(1, 101):
         predictions = np.zeros((1, 2))
         loss_list = []
@@ -105,5 +122,11 @@ if __name__ == "__main__":
         measure.reset()
         measure.update(predictions, labels)
         print('\tval acc: accuracy: {0:0.3f}'.format(measure.accuracy()))
+
+        if measure.accuracy() > best_accuracy:
+            best_accuracy = measure.accuracy()
+            torch.save(net.state_dict(), best_model_path)
+            print('\tNew best accuracy. Saved model to: "{}"'.format(best_model_path))
+
         accuracies.append(measure.accuracy())
     
