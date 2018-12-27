@@ -22,7 +22,7 @@ def load_dataset(subset: Subset, augment=False) -> batches.BatchGenerator:
     if augment:
         ops_list += [
             ops.hflip(),
-            ops.rcrop(32, 4, 'constant')
+            ops.rcrop(32, 12, 'reflect')
         ]
 
     ops_list += [
@@ -246,7 +246,7 @@ if __name__ == "__main__":
     learning_rate = 0.001
     weight_decay = 0.001
 
-    cnn_cl = cnn.CnnClassifier(model, (3, 32, 32), num_classes=2, lr=learning_rate, wd=weight_decay, adam=True)
+    cnn_cl = cnn.CnnClassifier(model, (3, 32, 32), num_classes=2, lr=learning_rate, wd=weight_decay, adam=False)
 
     loss_list = []
     measure = Accuracy()
