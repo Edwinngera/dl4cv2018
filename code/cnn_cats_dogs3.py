@@ -115,8 +115,6 @@ class PretrainedVGG16BnNet(nn.Module):
         classifier_layers = [nn.Linear(512, 4096, bias=True)] + classifier_layers + [nn.Linear(4096, 2, bias=True)]
         self.classifier = nn.Sequential(*classifier_layers)
 
-        print(self.classifier)
-
     def forward(self, x):
         x = self.features(x)
         x = x.view(x.size(0), -1)
@@ -193,9 +191,6 @@ if __name__ == "__main__":
 
         for validation_data in validation_batch:
             prediction = cnn_cl.predict(validation_data.data)
-
-            print(prediction.shape)
-            print(predictions.shape)
             predictions = np.vstack((predictions, prediction))
             labels.append(validation_data.label)
 
