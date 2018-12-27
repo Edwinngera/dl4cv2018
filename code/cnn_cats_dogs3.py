@@ -120,9 +120,9 @@ class PretrainedResnet18Net(nn.Module):
         x = self.classifier(x)
         return x
 
-class PretrainedVGG16BnNet(nn.Module):
+class PretrainedVGG11BnNet(nn.Module):
     def __init__(self):
-        super(PretrainedVGG16BnNet, self).__init__()
+        super(PretrainedVGG11BnNet, self).__init__()
         
         model = models.vgg11_bn(pretrained=True)
 
@@ -142,6 +142,27 @@ class PretrainedVGG16BnNet(nn.Module):
         x = self.classifier(x)
         return x
 
+class PretrainedVGG16BnNet(nn.Module):
+    def __init__(self):
+        super(PretrainedVGG16BnNet, self).__init__()
+        
+        model = models.vgg16_bn(pretrained=True)
+
+        self.features = model.features
+
+        classifier_layers = list(model.classifier.children())[1:-1]
+        classifier_layers = [nn.Linear(512, 4096, bias=True)] + classifier_layers + [nn.Linear(4096, 2, bias=True)]
+        self.classifier = nn.Sequential(*classifier_layers)
+
+    def enable_grad(self, enable):
+        for param in self.features.parameters():
+            param.requires_grad = enable
+
+    def forward(self, x):
+        x = self.features(x)
+        x = x.view(x.size(0), -1)
+        x = self.classifier(x)
+        return x
 
 def get_standard_model(dropout_probability=None):
     model = Net(dropout_probability)
