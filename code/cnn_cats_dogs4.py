@@ -22,11 +22,11 @@ def load_dataset(subset: Subset, augment=False) -> batches.BatchGenerator:
     if augment:
         ops_list += [
             ops.hflip(),
-            ops.resize((224, 224)),
-            ops.rcrop(224, 32, 'reflect')
+            ops.rcrop(32, 8, 'reflect')
         ]
 
     ops_list += [
+        ops.resize((224, 224)),
         ops.mul(1 / 255),
         ops.type_cast(np.float32),
         # Cifar-10:
