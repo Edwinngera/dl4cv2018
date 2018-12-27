@@ -16,7 +16,7 @@ class CnnClassifier(Model):
     The cross-entropy loss and SGD are used for training.
     '''
 
-    def __init__(self, net: nn.Module, input_shape: tuple, num_classes: int, lr: float, wd: float, adam=False):
+    def __init__(self, net: nn.Module, input_shape: tuple, num_classes: int, lr: float, wd: float, adam: bool=False):
         '''
         Ctor.
         net is the cnn to wrap. see above comments for requirements.
