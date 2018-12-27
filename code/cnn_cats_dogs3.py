@@ -86,7 +86,7 @@ class PretrainedResnet18Net(nn.Module):
         super(PretrainedResnet18Net, self).__init__()
         
         self.model = models.resnet18(pretrained=True)
-
+        self.avgpool = nn.AvgPool2d(kernel_size=(2,2))
         self.classifier = nn.Sequential(
             nn.Linear(in_features=512, out_features=4096, bias=True),
             nn.ReLU(),
@@ -111,7 +111,7 @@ class PretrainedResnet18Net(nn.Module):
         x = self.model.layer3(x)
         x = self.model.layer4(x)
         # x = self.model.avgpool(x)
-        # print(x.size())
+        # x = self.avgpool(x)
         x = x.view(x.size(0), -1)
         x = self.classifier(x)
         return x
