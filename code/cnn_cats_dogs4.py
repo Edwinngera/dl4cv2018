@@ -106,8 +106,8 @@ if __name__ == "__main__":
     mean_loss_list = []
 
     best_accuracy = 0
-    for epoch in range(1, 201):
-        if epoch == 50:
+    for epoch in range(1, 301):
+        if epoch == 100:
             enable_grad(model, True) # enable fine-tuning of pre-trained layers at epoch 50
         
         predictions = np.zeros((1, 2))
