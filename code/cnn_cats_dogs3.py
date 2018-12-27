@@ -104,6 +104,9 @@ class PretrainedResnet18Net(nn.Module):
     def enable_grad(self, enable):
         for param in self.model.parameters():
             param.requires_grad = enable
+
+        for param in self.model.layer4.parameters():
+            param.requires_grad = True
         
     def forward(self, x):
         x = self.model.conv1(x)
@@ -140,6 +143,9 @@ class PretrainedResnet50Net(nn.Module):
         for param in self.model.parameters():
             param.requires_grad = enable
         
+        for param in self.model.layer4.parameters():
+            param.requires_grad = True
+
     def forward(self, x):
         x = self.model.conv1(x)
         x = self.model.bn1(x)
