@@ -208,29 +208,6 @@ def get_pretrained_model():
     # return PretrainedResnet18Net()
     # return PretrainedResnet50Net()
 
-    # # model = models.resnet18(pretrained=True)
-    # # model = models.vgg11(pretrained=True)
-    # model = models.vgg11_bn(pretrained=True)
-
-    # print(model)
-    # for param in model.parameters():
-    #     param.requires_grad = False
-
-    # # num_features = model.fc.in_features
-    # num_features = model.classifier[-1].in_features
-    # print(num_features)
-
-    # final_layer = nn.Linear(num_features, 2)
-    
-    # if dropout_probability:
-    #     final_layer = nn.Sequential(
-    #         nn.Dropout(dropout_probability),
-    #         final_layer)
-    
-    # # model.fc = final_layer
-    # model.classifier[-1] = final_layer
-    # return model
-
 if __name__ == "__main__":
     best_model_path = 'best_model.pth'
 

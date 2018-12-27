@@ -66,8 +66,8 @@ def get_pretrained_vgg16bn_model():
     return model
 
 def get_pretrained_model():
-    # return get_pretrained_resnet18_model()
-    return get_pretrained_resnet50_model()
+    return get_pretrained_resnet18_model()
+    # return get_pretrained_resnet50_model()
     # return get_pretrained_vgg11bn_model()
     # return get_pretrained_vgg16bn_model()
 
@@ -75,11 +75,11 @@ def enable_grad(model, enable):
     for param in model.parameters():
         param.requires_grad = enable
     
-    if model.classifier: # vgg
+    if hasattr(model, 'classifier'): # vgg
         for param in model.classifier.parameters():
             param.requires_grad = True
 
-    if model.fc: # resnet
+    if hasattr(model, 'fc'): # resnet
         for param in model.fc.parameters():
             param.requires_grad = True
 
