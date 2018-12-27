@@ -86,8 +86,21 @@ class PretrainedResnet18Net(nn.Module):
         super(PretrainedResnet18Net, self).__init__()
         
         self.model = models.resnet18(pretrained=True)
-        self.model.fc = nn.Sequential(nn.Dropout(0.5), nn.Linear(512, 2, bias=True))
 
+        self.classifier = nn.Sequential(
+            nn.Linear(in_features=512, out_features=4096, bias=True),
+            nn.ReLU(),
+            nn.Dropout(p=0.5),
+            nn.Linear(in_features=4096, out_features=4096, bias=True),
+            nn.ReLU(),
+            nn.Dropout(p=0.5),
+            nn.Linear(in_features=4096, out_features=2, bias=True)
+        )
+
+    def enable_grad(self, enable):
+        for param in self.model.parameters():
+            param.requires_grad = enable
+        
     def forward(self, x):
         x = self.model.conv1(x)
         x = self.model.bn1(x)
@@ -100,7 +113,7 @@ class PretrainedResnet18Net(nn.Module):
         # x = self.model.avgpool(x)
         # print(x.size())
         x = x.view(x.size(0), -1)
-        x = self.model.fc(x)
+        x = self.classifier(x)
         return x
 
 class PretrainedVGG16BnNet(nn.Module):
@@ -115,6 +128,10 @@ class PretrainedVGG16BnNet(nn.Module):
         classifier_layers = [nn.Linear(512, 4096, bias=True)] + classifier_layers + [nn.Linear(4096, 2, bias=True)]
         self.classifier = nn.Sequential(*classifier_layers)
 
+    def enable_grad(self, enable):
+        for param in self.features.parameters():
+            param.requires_grad = enable
+
     def forward(self, x):
         x = self.features(x)
         x = x.view(x.size(0), -1)
@@ -127,8 +144,8 @@ def get_standard_model(dropout_probability=None):
     return model
 
 def get_pretrained_model():
-    return PretrainedVGG16BnNet()
-    # return PretrainedResnet18Net()
+    # return PretrainedVGG16BnNet()
+    return PretrainedResnet18Net()
 
     # # model = models.resnet18(pretrained=True)
     # # model = models.vgg11(pretrained=True)
@@ -160,6 +177,7 @@ if __name__ == "__main__":
     validation_batch = load_dataset(Subset.VALIDATION)
 
     model = get_pretrained_model()
+    model.enable_grad(False)  # fix pre-trained layer weights
 
     if torch.cuda.is_available():
         model = model.cuda()
@@ -176,6 +194,9 @@ if __name__ == "__main__":
 
     best_accuracy = 0
     for epoch in range(1, 101):
+        if epoch == 50:
+            model.enable_grad(True) # enable fine-tuning of pre-trained layers at epoch 50
+        
         predictions = np.zeros((1, 2))
         loss_list = []
         labels = []
