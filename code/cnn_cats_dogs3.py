@@ -193,7 +193,7 @@ if __name__ == "__main__":
     mean_loss_list = []
 
     best_accuracy = 0
-    for epoch in range(1, 101):
+    for epoch in range(1, 201):
         if epoch == 50:
             model.enable_grad(True) # enable fine-tuning of pre-trained layers at epoch 50
         
