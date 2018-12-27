@@ -67,9 +67,9 @@ def get_pretrained_vgg16bn_model():
 
 def get_pretrained_model():
     # return get_pretrained_resnet18_model()
-    return get_pretrained_resnet50_model()
+    # return get_pretrained_resnet50_model()
     # return get_pretrained_vgg11bn_model()
-    # return get_pretrained_vgg16bn_model()
+    return get_pretrained_vgg16bn_model()
 
 def enable_grad(model, enable):
     for param in model.parameters():
