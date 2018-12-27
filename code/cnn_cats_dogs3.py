@@ -148,8 +148,8 @@ def get_standard_model(dropout_probability=None):
     return model
 
 def get_pretrained_model():
-    # return PretrainedVGG16BnNet()
-    return PretrainedResnet18Net()
+    return PretrainedVGG16BnNet()
+    # return PretrainedResnet18Net()
 
     # # model = models.resnet18(pretrained=True)
     # # model = models.vgg11(pretrained=True)
@@ -189,7 +189,7 @@ if __name__ == "__main__":
     learning_rate = 0.01
     weight_decay = 0.001
 
-    cnn_cl = cnn.CnnClassifier(model, (3, 32, 32), num_classes=2, lr=learning_rate, wd=weight_decay)
+    cnn_cl = cnn.CnnClassifier(model, (3, 32, 32), num_classes=2, lr=learning_rate, wd=weight_decay, adam=True)
 
     loss_list = []
     measure = Accuracy()
