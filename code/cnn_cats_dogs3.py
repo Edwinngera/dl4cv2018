@@ -130,7 +130,7 @@ class PretrainedResnet50Net(nn.Module):
         self.model = models.resnet50(pretrained=True)
         self.avgpool = nn.AvgPool2d(kernel_size=(2,2))
         self.classifier = nn.Sequential(
-            nn.Linear(in_features=512, out_features=4096, bias=True),
+            nn.Linear(in_features=2048, out_features=4096, bias=True),
             nn.ReLU(),
             nn.Dropout(p=0.5),
             nn.Linear(in_features=4096, out_features=4096, bias=True),
