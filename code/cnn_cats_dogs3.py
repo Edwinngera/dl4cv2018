@@ -120,6 +120,40 @@ class PretrainedResnet18Net(nn.Module):
         x = self.classifier(x)
         return x
 
+class PretrainedResnet50Net(nn.Module):
+    def __init__(self):
+        super(PretrainedResnet50Net, self).__init__()
+        
+        self.model = models.resnet50(pretrained=True)
+        self.avgpool = nn.AvgPool2d(kernel_size=(2,2))
+        self.classifier = nn.Sequential(
+            nn.Linear(in_features=512, out_features=4096, bias=True),
+            nn.ReLU(),
+            nn.Dropout(p=0.5),
+            nn.Linear(in_features=4096, out_features=4096, bias=True),
+            nn.ReLU(),
+            nn.Dropout(p=0.5),
+            nn.Linear(in_features=4096, out_features=2, bias=True)
+        )
+
+    def enable_grad(self, enable):
+        for param in self.model.parameters():
+            param.requires_grad = enable
+        
+    def forward(self, x):
+        x = self.model.conv1(x)
+        x = self.model.bn1(x)
+        x = self.model.relu(x)
+        x = self.model.maxpool(x)
+        x = self.model.layer1(x)
+        x = self.model.layer2(x)
+        x = self.model.layer3(x)
+        x = self.model.layer4(x)
+        # x = self.model.avgpool(x)
+        x = x.view(x.size(0), -1)
+        x = self.classifier(x)
+        return x
+        
 class PretrainedVGG11BnNet(nn.Module):
     def __init__(self):
         super(PretrainedVGG11BnNet, self).__init__()
@@ -169,8 +203,10 @@ def get_standard_model(dropout_probability=None):
     return model
 
 def get_pretrained_model():
+    # return PretrainedVGG11BnNet()
     return PretrainedVGG16BnNet()
     # return PretrainedResnet18Net()
+    # return PretrainedResnet50Net()
 
     # # model = models.resnet18(pretrained=True)
     # # model = models.vgg11(pretrained=True)
@@ -210,7 +246,7 @@ if __name__ == "__main__":
     learning_rate = 0.01
     weight_decay = 0.001
 
-    cnn_cl = cnn.CnnClassifier(model, (3, 32, 32), num_classes=2, lr=learning_rate, wd=weight_decay, adam=False)
+    cnn_cl = cnn.CnnClassifier(model, (3, 32, 32), num_classes=2, lr=learning_rate, wd=weight_decay, adam=True)
 
     loss_list = []
     measure = Accuracy()
