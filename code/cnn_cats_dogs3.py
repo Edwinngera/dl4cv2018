@@ -77,29 +77,57 @@ class Net(nn.Module):
         x = self.fc3(x)
         return x
 
+import torchvision.models as models
+
+class PretrainedVGG16BnNet(nn.Module):
+    def __init__(self):
+        super(PretrainedVGG16BnNet, self).__init__()
+        
+        model = models.vgg11_bn(pretrained=True)
+
+        self.features = model.features
+
+        classifier_layers = list(model.classifier.children())[1:]
+        classifier_layers = [nn.Linear(512, 4096, bias=True)] + classifier_layers
+        self.classifier = nn.Sequential(*classifier_layers)
+
+    def forward(self, x):
+        x = self.features(x)
+        x = x.view(x.size(0), -1)
+        x = self.classifier(x)
+        return x
+
 
 def get_standard_model(dropout_probability=None):
     model = Net(dropout_probability)
     return model
 
-def get_pretrained_model(dropout_probability=None):
-    import torchvision.models as models
-    model = models.resnet18(pretrained=True)
-
-    for param in model.parameters():
-        param.requires_grad = False
-
-    num_features = model.fc.in_features
-
-    final_layer = nn.Linear(num_features, 2)
-    
-    if dropout_probability:
-        final_layer = nn.Sequential(
-            nn.Dropout(dropout_probability),
-            final_layer)
-    
-    model.fc = final_layer
+def get_pretrained_model():
+    model = PretrainedVGG16BnNet()
     return model
+
+    # # model = models.resnet18(pretrained=True)
+    # # model = models.vgg11(pretrained=True)
+    # model = models.vgg11_bn(pretrained=True)
+
+    # print(model)
+    # for param in model.parameters():
+    #     param.requires_grad = False
+
+    # # num_features = model.fc.in_features
+    # num_features = model.classifier[-1].in_features
+    # print(num_features)
+
+    # final_layer = nn.Linear(num_features, 2)
+    
+    # if dropout_probability:
+    #     final_layer = nn.Sequential(
+    #         nn.Dropout(dropout_probability),
+    #         final_layer)
+    
+    # # model.fc = final_layer
+    # model.classifier[-1] = final_layer
+    # return model
 
 if __name__ == "__main__":
     best_model_path = 'best_model.pth'
@@ -107,11 +135,7 @@ if __name__ == "__main__":
     training_batch = load_dataset(Subset.TRAINING, augment=True)
     validation_batch = load_dataset(Subset.VALIDATION)
 
-    model = get_standard_model(dropout_probability=0.2) #
-    # model = get_standard_model(dropout_probability=0.2) # BEST with augment
-    # model = get_standard_model(dropout_probability=None)
-
-    # model = get_pretrained_model(dropout_probability=None)
+    model = get_pretrained_model()
 
     if torch.cuda.is_available():
         model = model.cuda()
