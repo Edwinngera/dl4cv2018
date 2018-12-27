@@ -210,9 +210,9 @@ def get_standard_model(dropout_probability=None):
 
 def get_pretrained_model():
     # return PretrainedVGG11BnNet()
-    return PretrainedVGG16BnNet()
+    # return PretrainedVGG16BnNet()
     # return PretrainedResnet18Net()
-    # return PretrainedResnet50Net()
+    return PretrainedResnet50Net()
 
 if __name__ == "__main__":
     best_model_path = 'best_model.pth'
