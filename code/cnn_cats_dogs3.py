@@ -26,10 +26,12 @@ def load_dataset(subset: Subset, augment=False) -> batches.BatchGenerator:
         ]
 
     ops_list += [
-        ops.hwc2chw(),
-        ops.add(-127.5),
-        ops.mul(1 / 127.5),
-        ops.type_cast(np.float32)
+        # ops.add(-127.5),
+        ops.mul(1 / 255),
+        ops.type_cast(np.float32),
+        ops.normalize(  mean=np.array([0.485, 0.456, 0.406]),
+                        std=np.array([0.229, 0.224, 0.225])),
+        ops.hwc2chw()
     ]
 
     op = ops.chain(ops_list)
@@ -79,6 +81,28 @@ class Net(nn.Module):
 
 import torchvision.models as models
 
+class PretrainedResnet18Net(nn.Module):
+    def __init__(self):
+        super(PretrainedResnet18Net, self).__init__()
+        
+        self.model = models.resnet18(pretrained=True)
+        self.model.fc = nn.Sequential(nn.Dropout(0.5), nn.Linear(512, 2, bias=True))
+
+    def forward(self, x):
+        x = self.model.conv1(x)
+        x = self.model.bn1(x)
+        x = self.model.relu(x)
+        x = self.model.maxpool(x)
+        x = self.model.layer1(x)
+        x = self.model.layer2(x)
+        x = self.model.layer3(x)
+        x = self.model.layer4(x)
+        # x = self.model.avgpool(x)
+        # print(x.size())
+        x = x.view(x.size(0), -1)
+        x = self.model.fc(x)
+        return x
+
 class PretrainedVGG16BnNet(nn.Module):
     def __init__(self):
         super(PretrainedVGG16BnNet, self).__init__()
@@ -87,9 +111,11 @@ class PretrainedVGG16BnNet(nn.Module):
 
         self.features = model.features
 
-        classifier_layers = list(model.classifier.children())[1:]
-        classifier_layers = [nn.Linear(512, 4096, bias=True)] + classifier_layers
+        classifier_layers = list(model.classifier.children())[1:-1]
+        classifier_layers = [nn.Linear(512, 4096, bias=True)] + classifier_layers + [nn.Linear(4096, 2, bias=True)]
         self.classifier = nn.Sequential(*classifier_layers)
+
+        print(self.classifier)
 
     def forward(self, x):
         x = self.features(x)
@@ -103,8 +129,8 @@ def get_standard_model(dropout_probability=None):
     return model
 
 def get_pretrained_model():
-    model = PretrainedVGG16BnNet()
-    return model
+    return PretrainedVGG16BnNet()
+    # return PretrainedResnet18Net()
 
     # # model = models.resnet18(pretrained=True)
     # # model = models.vgg11(pretrained=True)
@@ -168,6 +194,8 @@ if __name__ == "__main__":
         for validation_data in validation_batch:
             prediction = cnn_cl.predict(validation_data.data)
 
+            print(prediction.shape)
+            print(predictions.shape)
             predictions = np.vstack((predictions, prediction))
             labels.append(validation_data.label)
 

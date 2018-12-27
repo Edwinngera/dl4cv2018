@@ -113,3 +113,18 @@ def rcrop(sz: int, pad: int, pad_mode: str) -> Op:
         return cropped
 
     return op
+
+def normalize(mean: np.ndarray, std: np.ndarray) -> Op:
+    '''
+    Mean/stddev normalization for multi-dimensional arrays
+    See https://pytorch.org/docs/stable/torchvision/transforms.html#torchvision.transforms.Normalize
+    '''
+    if mean.shape != std.shape:
+        raise ValueError('mean and std shapes must match')
+
+    def op(sample: np.ndarray) -> np.ndarray:
+        sample -= mean
+        sample /= std
+        return sample
+
+    return op
