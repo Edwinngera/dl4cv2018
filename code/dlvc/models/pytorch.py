@@ -51,7 +51,7 @@ class CnnClassifier(Model):
         self.criterion = nn.CrossEntropyLoss()
 
         if adam:
-            self.optimizer = optim.Adam(net.parameters, lr=self.lr, weight_decay=self.wd)
+            self.optimizer = optim.Adam(net.parameters(), lr=self.lr, weight_decay=self.wd)
         else:
             self.optimizer = optim.SGD(net.parameters(), lr=self.lr, weight_decay=self.wd, momentum=0.9, nesterov=True)
 
