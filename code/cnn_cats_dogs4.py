@@ -66,8 +66,8 @@ def get_pretrained_vgg16bn_model():
     return model
 
 def get_pretrained_model():
-    return get_pretrained_resnet18_model()
-    # return get_pretrained_resnet50_model()
+    # return get_pretrained_resnet18_model()
+    return get_pretrained_resnet50_model()
     # return get_pretrained_vgg11bn_model()
     # return get_pretrained_vgg16bn_model()
 
@@ -80,6 +80,8 @@ def enable_grad(model, enable):
             param.requires_grad = True
 
     if hasattr(model, 'fc'): # resnet
+        for param in model.layer4.parameters():
+            param.requires_grad = True
         for param in model.fc.parameters():
             param.requires_grad = True
 
