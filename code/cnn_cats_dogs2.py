@@ -26,16 +26,10 @@ def load_dataset(subset: Subset, augment=False) -> batches.BatchGenerator:
         ]
 
     ops_list += [
-        # ops.add(-127.5),
-        ops.mul(1 / 255),
-        ops.type_cast(np.float32),
-        # Imagenet:
-        # ops.normalize(  mean=np.array([0.485, 0.456, 0.406]),
-        #                 std=np.array([0.229, 0.224, 0.225])),
-        # Cifar-10:
-        ops.normalize(  mean=np.array([0.41477802, 0.45935813, 0.49693552]),
-                        std=np.array([0.25241926, 0.24699265, 0.25279155])),
-        ops.hwc2chw()
+        ops.hwc2chw(),
+        ops.add(-127.5),
+        ops.mul(1 / 127.5),
+        ops.type_cast(np.float32)
     ]
 
     op = ops.chain(ops_list)
