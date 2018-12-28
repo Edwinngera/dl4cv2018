@@ -77,7 +77,7 @@ if __name__ == "__main__":
     training_batch = load_dataset(Subset.TRAINING, augment=True)
     validation_batch = load_dataset(Subset.VALIDATION)
 
-    model = get_standard_model(0.2)
+    model = get_standard_model(0.5)
 
     if torch.cuda.is_available():
         model = model.cuda()
