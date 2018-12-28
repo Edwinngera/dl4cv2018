@@ -26,7 +26,6 @@ def load_dataset(subset: Subset, augment=False) -> batches.BatchGenerator:
         ]
 
     ops_list += [
-        # ops.add(-127.5),
         ops.mul(1 / 255),
         ops.type_cast(np.float32),
         # Imagenet:
@@ -226,7 +225,7 @@ if __name__ == "__main__":
     if torch.cuda.is_available():
         model = model.cuda()
 
-    learning_rate = 0.001
+    learning_rate = 0.01
     weight_decay = 0.001
 
     cnn_cl = cnn.CnnClassifier(model, (3, 32, 32), num_classes=2, lr=learning_rate, wd=weight_decay, adam=False)
