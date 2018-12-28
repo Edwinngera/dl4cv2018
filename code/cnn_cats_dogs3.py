@@ -238,8 +238,12 @@ if __name__ == "__main__":
     best_accuracy = 0
     for epoch in range(1, 301):
         if epoch == 100:
-            model.enable_grad(True) # enable fine-tuning of pre-trained layers at epoch 50
+            model.enable_grad(True) # enable fine-tuning of pre-trained layers
         
+        if epoch == 150:
+            for param_group in cnn_cl.optimizer.param_groups:
+                param_group['lr'] = 0.001
+
         predictions = np.zeros((1, 2))
         loss_list = []
         labels = []
