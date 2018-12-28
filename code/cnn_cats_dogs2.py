@@ -82,7 +82,7 @@ if __name__ == "__main__":
     if torch.cuda.is_available():
         model = model.cuda()
 
-    learning_rate = 0.01
+    learning_rate = 0.1
     # weight_decay = 0
     weight_decay = 0.001
 
