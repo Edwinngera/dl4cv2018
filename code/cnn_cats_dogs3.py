@@ -22,7 +22,7 @@ def load_dataset(subset: Subset, augment=False) -> batches.BatchGenerator:
     if augment:
         ops_list += [
             ops.hflip(),
-            ops.rcrop(32, 12, 'reflect')
+            ops.rcrop(32, 12, 'constant')
         ]
 
     ops_list += [
