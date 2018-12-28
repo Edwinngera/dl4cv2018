@@ -59,7 +59,8 @@ if __name__ == "__main__":
         net = net.cuda()
 
     learning_rate = 0.01
-    weight_decay = 0.001
+    # weight_decay = 0.001
+    weight_decay = 0
 
     cnn_cl = cnn.CnnClassifier(net, (3, 32, 32), num_classes=2, lr=learning_rate, wd=weight_decay)
 
