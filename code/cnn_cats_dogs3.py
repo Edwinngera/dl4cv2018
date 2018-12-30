@@ -190,19 +190,32 @@ class PretrainedVGG16BnNet(nn.Module):
 
         self.features = model.features
 
-        # classifier_layers = list(model.classifier.children())[1:-1]
-        # classifier_layers = [nn.Linear(512, 4096, bias=True)] + classifier_layers + [nn.Linear(4096, 2, bias=True)]
-        # self.classifier = nn.Sequential(*classifier_layers)
+        classifier_layers = list(model.classifier.children())[1:-1]
+        classifier_layers = [nn.Linear(512, 4096, bias=True)] + classifier_layers + [nn.Linear(4096, 2, bias=True)]
+        self.classifier = nn.Sequential(*classifier_layers)
+
+    def enable_grad(self, enable):
+        for param in self.features.parameters():
+            param.requires_grad = enable
+
+    def forward(self, x):
+        x = self.features(x)
+        x = x.view(x.size(0), -1)
+        x = self.classifier(x)
+        return x
+
+class PretrainedVGG19BnNet(nn.Module):
+    def __init__(self):
+        super(PretrainedVGG19BnNet, self).__init__()
+        
+        model = models.vgg19_bn(pretrained=True)
+
+        self.features = model.features
+
+        classifier_layers = list(model.classifier.children())[1:-1]
+        classifier_layers = [nn.Linear(512, 4096, bias=True)] + classifier_layers + [nn.Linear(4096, 2, bias=True)]
+        self.classifier = nn.Sequential(*classifier_layers)
     
-        self.classifier = nn.Sequential(
-            nn.Linear(in_features=512, out_features=256, bias=True),
-            nn.ReLU(),
-            nn.Dropout(p=0.5),
-            nn.Linear(in_features=256, out_features=128, bias=True),
-            nn.ReLU(),
-            nn.Dropout(p=0.5),
-            nn.Linear(in_features=128, out_features=2, bias=True)
-        )
 
     def enable_grad(self, enable):
         for param in self.features.parameters():
@@ -220,7 +233,8 @@ def get_standard_model(dropout_probability=None):
 
 def get_pretrained_model():
     # return PretrainedVGG11BnNet()
-    return PretrainedVGG16BnNet()
+    # return PretrainedVGG16BnNet()
+    return PretrainedVGG19BnNet()
     # return PretrainedResnet18Net()
     # return PretrainedResnet50Net()
 
