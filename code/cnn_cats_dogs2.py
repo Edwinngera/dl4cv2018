@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
     learning_rate = 0.001
     # weight_decay = 0
-    weight_decay = 0.001
+    weight_decay = 0.01
 
     cnn_cl = cnn.CnnClassifier(model, (3, 32, 32), num_classes=2, lr=learning_rate, wd=weight_decay, adam=False)
 
