@@ -167,9 +167,19 @@ class PretrainedVGG11BnNet(nn.Module):
 
         self.features = model.features
 
-        classifier_layers = list(model.classifier.children())[1:-1]
-        classifier_layers = [nn.Linear(512, 4096, bias=True)] + classifier_layers + [nn.Linear(4096, 2, bias=True)]
-        self.classifier = nn.Sequential(*classifier_layers)
+        # classifier_layers = list(model.classifier.children())[1:-1]
+        # classifier_layers = [nn.Linear(512, 4096, bias=True)] + classifier_layers + [nn.Linear(4096, 2, bias=True)]
+        # self.classifier = nn.Sequential(*classifier_layers)
+
+        self.classifier = nn.Sequential(
+            nn.Linear(in_features=512, out_features=1025624, bias=True),
+            nn.ReLU(),
+            nn.Dropout(p=0.5),
+            nn.Linear(in_features=256, out_features=128, bias=True),
+            nn.ReLU(),
+            nn.Dropout(p=0.5),
+            nn.Linear(in_features=128, out_features=2, bias=True)
+        )
 
     def enable_grad(self, enable):
         for param in self.features.parameters():
@@ -192,6 +202,7 @@ class PretrainedVGG16BnNet(nn.Module):
         classifier_layers = list(model.classifier.children())[1:-1]
         classifier_layers = [nn.Linear(512, 4096, bias=True)] + classifier_layers + [nn.Linear(4096, 2, bias=True)]
         self.classifier = nn.Sequential(*classifier_layers)
+        print(classifier_layers)
 
     def enable_grad(self, enable):
         for param in self.features.parameters():
@@ -209,9 +220,9 @@ def get_standard_model(dropout_probability=None):
 
 def get_pretrained_model():
     # return PretrainedVGG11BnNet()
-    # return PretrainedVGG16BnNet()
+    return PretrainedVGG16BnNet()
     # return PretrainedResnet18Net()
-    return PretrainedResnet50Net()
+    # return PretrainedResnet50Net()
 
 if __name__ == "__main__":
     best_model_path = 'best_model.pth'
@@ -236,7 +247,7 @@ if __name__ == "__main__":
     mean_loss_list = []
 
     best_accuracy = 0
-    for epoch in range(1, 301):
+    for epoch in range(1, 101):
         if epoch == 100:
             model.enable_grad(True) # enable fine-tuning of pre-trained layers
         

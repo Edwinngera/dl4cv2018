@@ -77,14 +77,14 @@ if __name__ == "__main__":
     training_batch = load_dataset(Subset.TRAINING, augment=True)
     validation_batch = load_dataset(Subset.VALIDATION)
 
-    model = get_standard_model(0.2)
+    model = get_standard_model(None)
 
     if torch.cuda.is_available():
         model = model.cuda()
 
-    learning_rate = 0.001
+    learning_rate = 0.1
     # weight_decay = 0
-    weight_decay = 0.01
+    weight_decay = 0.001
 
     cnn_cl = cnn.CnnClassifier(model, (3, 32, 32), num_classes=2, lr=learning_rate, wd=weight_decay, adam=False)
 
