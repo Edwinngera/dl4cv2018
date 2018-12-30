@@ -58,7 +58,7 @@ if __name__ == "__main__":
     if torch.cuda.is_available():
         net = net.cuda()
 
-    learning_rate = 0.01
+    learning_rate = 0.001
     # weight_decay = 0.001
     weight_decay = 0
 
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     mean_loss_list = []
 
     best_accuracy = 0
-    for epoch in range(1, 301):
+    for epoch in range(1, 101):
         predictions = np.zeros((1, 2))
         loss_list = []
         labels = []

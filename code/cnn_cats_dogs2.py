@@ -82,9 +82,9 @@ if __name__ == "__main__":
     if torch.cuda.is_available():
         model = model.cuda()
 
-    learning_rate = 0.1
-    # weight_decay = 0
-    weight_decay = 0.001
+    learning_rate = 0.001
+    weight_decay = 0
+    # weight_decay = 0.001
 
     cnn_cl = cnn.CnnClassifier(model, (3, 32, 32), num_classes=2, lr=learning_rate, wd=weight_decay, adam=False)
 
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     mean_loss_list = []
 
     best_accuracy = 0
-    for epoch in range(1, 301):        
+    for epoch in range(1, 101):        
         predictions = np.zeros((1, 2))
         loss_list = []
         labels = []
