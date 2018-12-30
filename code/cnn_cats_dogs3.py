@@ -262,10 +262,10 @@ if __name__ == "__main__":
 
     best_accuracy = 0
     for epoch in range(1, 101):
-        if epoch == 100:
+        if epoch == 25:
             model.enable_grad(True) # enable fine-tuning of pre-trained layers
         
-        if epoch == 150:
+        if epoch == 50:
             for param_group in cnn_cl.optimizer.param_groups:
                 param_group['lr'] = 0.001
 
