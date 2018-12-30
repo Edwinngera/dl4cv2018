@@ -195,7 +195,7 @@ class PretrainedVGG16BnNet(nn.Module):
         # self.classifier = nn.Sequential(*classifier_layers)
     
         self.classifier = nn.Sequential(
-            nn.Linear(in_features=512, out_features=1024, bias=True),
+            nn.Linear(in_features=512, out_features=256, bias=True),
             nn.ReLU(),
             nn.Dropout(p=0.5),
             nn.Linear(in_features=256, out_features=128, bias=True),
