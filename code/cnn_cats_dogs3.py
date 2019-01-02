@@ -141,7 +141,10 @@ class PretrainedResnet50Net(nn.Module):
     def enable_grad(self, enable):
         for param in self.model.parameters():
             param.requires_grad = enable
-        
+
+        for param in self.model.layer3.parameters():
+            param.requires_grad = True
+
         for param in self.model.layer4.parameters():
             param.requires_grad = True
 
@@ -261,11 +264,13 @@ if __name__ == "__main__":
     mean_loss_list = []
 
     best_accuracy = 0
-    for epoch in range(1, 101):
-        if epoch == 25:
+    for epoch in range(1, 301):
+        # if epoch == 25:
+        if epoch == 75:
             model.enable_grad(True) # enable fine-tuning of pre-trained layers
         
-        if epoch == 50:
+        # if epoch == 50:
+        if epoch == 150:
             for param_group in cnn_cl.optimizer.param_groups:
                 param_group['lr'] = 0.001
 
