@@ -1,18 +1,13 @@
 from dlvc.dataset import Subset
 from dlvc.datasets.pets import PetsDataset
 from dlvc.test import Accuracy
-from dlvc.models import knn, pytorch as cnn
+from dlvc.models import pytorch as cnn
 from dlvc import ops, batches
 
 import numpy as np
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-import matplotlib.pyplot as plt
-
-INPUT_DIM = 3072
-NUM_CLASSES = 2
-
+import torchvision.models as models
 
 def load_dataset(subset: Subset, augment=False) -> batches.BatchGenerator:
     dataset = PetsDataset('../data/cifar-10-batches-py', subset)
@@ -41,172 +36,6 @@ def load_dataset(subset: Subset, augment=False) -> batches.BatchGenerator:
 
     return batches.BatchGenerator(dataset, 128, True, op)
 
-class Net(nn.Module):
-    def __init__(self, dropout_probability=None):
-        super(Net, self).__init__()
-        # Deep conv filters produce better results
-        # Adding more conv layers does not seem to help
-        
-        self.dropout = None
-
-        if dropout_probability:
-            self.dropout = nn.Dropout(dropout_probability)
-
-        self.pool = nn.MaxPool2d(2, 2)
-        self.conv1 = nn.Conv2d(3, 64, 5)
-        self.conv2 = nn.Conv2d(64, 128, 5)
-        # self.conv3 = nn.Conv2d(128, 256, 5)
-        # self.fc1 = nn.Linear(256 * 1 * 1, 128)
-        self.fc1 = nn.Linear(128 * 5 * 5, 128)
-        self.fc2 = nn.Linear(128, 64)
-        self.fc3 = nn.Linear(64, 2)
-
-    def forward(self, x):
-        x = self.pool(F.relu(self.conv1(x)))
-        # if self.dropout:
-        #     x = self.dropout(x)
-        x = self.pool(F.relu(self.conv2(x)))
-        # if self.dropout:
-        #     x = self.dropout(x)
-        # x = self.pool(F.relu(self.conv3(x)))
-        # if self.dropout:
-        #     x = self.dropout(x)
-        # x = x.view(-1, 256 * 1 * 1)
-        x = x.view(-1, 128 * 5 * 5)
-        x = F.relu(self.fc1(x))
-        if self.dropout:
-            x = self.dropout(x)
-        x = F.relu(self.fc2(x))
-        if self.dropout:
-            x = self.dropout(x)
-        x = self.fc3(x)
-        return x
-
-import torchvision.models as models
-
-class PretrainedResnet18Net(nn.Module):
-    def __init__(self):
-        super(PretrainedResnet18Net, self).__init__()
-        
-        self.model = models.resnet18(pretrained=True)
-        self.avgpool = nn.AvgPool2d(kernel_size=(2,2))
-        self.classifier = nn.Sequential(
-            nn.Linear(in_features=512, out_features=4096, bias=True),
-            nn.ReLU(),
-            nn.Dropout(p=0.5),
-            nn.Linear(in_features=4096, out_features=4096, bias=True),
-            nn.ReLU(),
-            nn.Dropout(p=0.5),
-            nn.Linear(in_features=4096, out_features=2, bias=True)
-        )
-
-    def enable_grad(self, enable):
-        for param in self.model.parameters():
-            param.requires_grad = enable
-
-        for param in self.model.layer4.parameters():
-            param.requires_grad = True
-        
-    def forward(self, x):
-        x = self.model.conv1(x)
-        x = self.model.bn1(x)
-        x = self.model.relu(x)
-        x = self.model.maxpool(x)
-        x = self.model.layer1(x)
-        x = self.model.layer2(x)
-        x = self.model.layer3(x)
-        x = self.model.layer4(x)
-        # x = self.model.avgpool(x)
-        # x = self.avgpool(x)
-        x = x.view(x.size(0), -1)
-        x = self.classifier(x)
-        return x
-
-class PretrainedResnet50Net(nn.Module):
-    def __init__(self):
-        super(PretrainedResnet50Net, self).__init__()
-        
-        self.model = models.resnet50(pretrained=True)
-        self.avgpool = nn.AvgPool2d(kernel_size=(2,2))
-        self.classifier = nn.Sequential(
-            nn.Linear(in_features=2048, out_features=4096, bias=True),
-            nn.ReLU(),
-            nn.Dropout(p=0.5),
-            nn.Linear(in_features=4096, out_features=4096, bias=True),
-            nn.ReLU(),
-            nn.Dropout(p=0.5),
-            nn.Linear(in_features=4096, out_features=2, bias=True)
-        )
-
-    def enable_grad(self, enable):
-        for param in self.model.parameters():
-            param.requires_grad = enable
-
-        for param in self.model.layer3.parameters():
-            param.requires_grad = True
-
-        for param in self.model.layer4.parameters():
-            param.requires_grad = True
-
-    def forward(self, x):
-        x = self.model.conv1(x)
-        x = self.model.bn1(x)
-        x = self.model.relu(x)
-        x = self.model.maxpool(x)
-        x = self.model.layer1(x)
-        x = self.model.layer2(x)
-        x = self.model.layer3(x)
-        x = self.model.layer4(x)
-        # x = self.model.avgpool(x)
-        x = x.view(x.size(0), -1)
-        x = self.classifier(x)
-        return x
-        
-class PretrainedVGG11BnNet(nn.Module):
-    def __init__(self):
-        super(PretrainedVGG11BnNet, self).__init__()
-        
-        model = models.vgg11_bn(pretrained=True)
-
-        self.features = model.features
-
-        classifier_layers = list(model.classifier.children())[1:-1]
-        classifier_layers = [nn.Linear(512, 4096, bias=True)] + classifier_layers + [nn.Linear(4096, 2, bias=True)]
-        self.classifier = nn.Sequential(*classifier_layers)
-
-
-    def enable_grad(self, enable):
-        for param in self.features.parameters():
-            param.requires_grad = enable
-
-    def forward(self, x):
-        x = self.features(x)
-        x = x.view(x.size(0), -1)
-        x = self.classifier(x)
-        return x
-
-class PretrainedVGG16BnNet(nn.Module):
-    def __init__(self):
-        super(PretrainedVGG16BnNet, self).__init__()
-        
-        model = models.vgg16_bn(pretrained=True)
-
-        self.features = model.features
-
-        classifier_layers = list(model.classifier.children())[1:-1]
-        classifier_layers = [nn.Linear(512, 4096, bias=True)] + classifier_layers + [nn.Linear(4096, 2, bias=True)]
-        self.classifier = nn.Sequential(*classifier_layers)
-
-    def enable_grad(self, enable):
-        for param in self.features.parameters():
-            param.requires_grad = enable
-
-    def forward(self, x):
-        x = self.features(x)
-        x = x.view(x.size(0), -1)
-        x = self.classifier(x)
-        return x
-
 class PretrainedVGG19BnNet(nn.Module):
     def __init__(self):
         super(PretrainedVGG19BnNet, self).__init__()
@@ -230,24 +59,13 @@ class PretrainedVGG19BnNet(nn.Module):
         x = self.classifier(x)
         return x
 
-def get_standard_model(dropout_probability=None):
-    model = Net(dropout_probability)
-    return model
-
-def get_pretrained_model():
-    # return PretrainedVGG11BnNet()
-    # return PretrainedVGG16BnNet()
-    return PretrainedVGG19BnNet()
-    # return PretrainedResnet18Net()
-    # return PretrainedResnet50Net()
-
 if __name__ == "__main__":
     best_model_path = 'best_model.pth'
 
     training_batch = load_dataset(Subset.TRAINING, augment=True)
     validation_batch = load_dataset(Subset.VALIDATION)
 
-    model = get_pretrained_model()
+    model = PretrainedVGG19BnNet()
     model.enable_grad(False)  # fix pre-trained layer weights
 
     if torch.cuda.is_available():
@@ -265,11 +83,9 @@ if __name__ == "__main__":
 
     best_accuracy = 0
     for epoch in range(1, 301):
-        # if epoch == 25:
         if epoch == 75:
             model.enable_grad(True) # enable fine-tuning of pre-trained layers
         
-        # if epoch == 50:
         if epoch == 150:
             for param_group in cnn_cl.optimizer.param_groups:
                 param_group['lr'] = 0.001

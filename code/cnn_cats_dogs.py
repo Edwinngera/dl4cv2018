@@ -1,18 +1,13 @@
 from dlvc.dataset import Subset
 from dlvc.datasets.pets import PetsDataset
 from dlvc.test import Accuracy
-from dlvc.models import knn, pytorch as cnn
+from dlvc.models import pytorch as cnn
 from dlvc import ops, batches
 
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import matplotlib.pyplot as plt
-
-INPUT_DIM = 3072
-NUM_CLASSES = 2
-
 
 def load_dataset(subset: Subset) -> batches.BatchGenerator:
     dataset = PetsDataset('../data/cifar-10-batches-py', subset)
@@ -59,7 +54,6 @@ if __name__ == "__main__":
         net = net.cuda()
 
     learning_rate = 0.001
-    # weight_decay = 0.001
     weight_decay = 0
 
     cnn_cl = cnn.CnnClassifier(net, (3, 32, 32), num_classes=2, lr=learning_rate, wd=weight_decay)
@@ -70,7 +64,7 @@ if __name__ == "__main__":
     mean_loss_list = []
 
     best_accuracy = 0
-    for epoch in range(1, 101):
+    for epoch in range(1, 301):
         predictions = np.zeros((1, 2))
         loss_list = []
         labels = []
