@@ -128,15 +128,3 @@ def normalize(mean: np.ndarray, std: np.ndarray) -> Op:
         return sample
 
     return op
-
-def resize(new_size: np.ndarray):
-    '''
-    Rescale image to given size
-    See http://scikit-image.org/docs/dev/api/skimage.transform.html#skimage.transform.resize
-    '''
-    from skimage.transform import resize
-
-    def op(sample: np.ndarray) -> np.ndarray:
-        return resize(sample, new_size)
-
-    return op
