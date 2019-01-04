@@ -115,7 +115,7 @@ class Accuracy(PerformanceMeasure):
         '''
 
         # TODO implement
-        if type(self.accuracy) is not type(other):
+        if type(self.accuracy_score) is not type(other):
             raise ValueError('types differ')
 
         return self.accuracy() < other
