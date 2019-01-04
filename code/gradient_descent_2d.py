@@ -115,12 +115,9 @@ if __name__ == '__main__':
 
     _velocity = Vec2(0, 0)
 
-    min_step = 1e-4
+    min_step = 1e-6
 
     while True:
-        cv2.imshow('Progress', vis)
-        cv2.waitKey(50)  # 20 fps, tune according to your liking
-
         gradient_eval_loc = loc
 
         if use_nesterov:
@@ -136,7 +133,13 @@ if __name__ == '__main__':
         loc_delta_dist = math.sqrt(math.pow(loc.x1 - new_loc.x1, 2) * math.pow(loc.x2 - new_loc.x2, 2))
         loc = new_loc
 
-        if loc_delta_dist <= min_step :
+        cv2.imshow('Progress', vis)
+        cv2.waitKey(50)  # 20 fps, tune according to your liking
+
+        print(loc_delta_dist)
+        if loc_delta_dist <= min_step:
+            cv2.circle(vis, (int(new_loc.x1), int(new_loc.x2)), 4, (255, 255, 0), -1)
+            cv2.imshow('Progress', vis)
             break
 
     print('Finished', loc, _gradient)
