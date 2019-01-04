@@ -16,7 +16,7 @@ class CnnClassifier(Model):
     The cross-entropy loss and SGD are used for training.
     '''
 
-    def __init__(self, net: nn.Module, input_shape: tuple, num_classes: int, lr: float, wd: float, adam: bool=False):
+    def __init__(self, net: nn.Module, input_shape: tuple, num_classes: int, lr: float, wd: float):
         '''
         Ctor.
         net is the cnn to wrap. see above comments for requirements.
@@ -50,10 +50,7 @@ class CnnClassifier(Model):
         # cross-entropy loss includes normalization so no softmax is required
         self.criterion = nn.CrossEntropyLoss()
 
-        if adam:
-            self.optimizer = optim.Adam(net.parameters(), lr=self.lr, weight_decay=self.wd)
-        else:
-            self.optimizer = optim.SGD(net.parameters(), lr=self.lr, weight_decay=self.wd, momentum=0.9, nesterov=True)
+        self.optimizer = optim.SGD(net.parameters(), lr=self.lr, weight_decay=self.wd, momentum=0.9, nesterov=True)
 
     def input_shape(self) -> tuple:
         '''
